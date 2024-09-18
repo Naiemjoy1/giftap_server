@@ -44,6 +44,7 @@ async function run() {
       res.send(result);
     });
 
+    // emni
     // app.get("/users", verifyToken, verifyAdmin, async (req, res) => {
     //     const result = await userCollection.find().toArray();
     //     res.send(result);
