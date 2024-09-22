@@ -4,6 +4,7 @@ require("dotenv").config();
 const { connectDB } = require("./config/db");
 const productRoutes = require("./routes/products");
 const userRoutes = require("./routes/users");
+const reviewRoutes = require("./routes/reviews");
 const app = express();
 const port = process.env.PORT || 3000;
 
@@ -25,7 +26,8 @@ connectDB();
 
 // Use routes
 app.use("/products", productRoutes);
-app.use("/api/users", userRoutes);
+app.use("/review", reviewRoutes);
+app.use("/users", userRoutes);
 
 app.get("/", (req, res) => {
   res.send("giftap Server Running");
