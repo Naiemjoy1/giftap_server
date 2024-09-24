@@ -19,13 +19,11 @@ router.post("/", async (req, res) => {
     const existingUser = await usersCollection.findOne({ email: user.email });
 
     if (existingUser) {
-      // If user already exists, return existing user info
       return res
         .status(200)
         .send({ message: "User already exists", user: existingUser });
     }
 
-    // Handle social sign-ins
     if (user.provider) {
       const newUser = {
         name: user.name,
@@ -41,12 +39,11 @@ router.post("/", async (req, res) => {
       });
     }
 
-    // Handle normal user registration (with password)
     const hashedPassword = await bcrypt.hash(user.password, 10);
 
     const newUser = {
       ...user,
-      password: hashedPassword, // Store the hashed password
+      password: hashedPassword,
     };
 
     const result = await usersCollection.insertOne(newUser);
