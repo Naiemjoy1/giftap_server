@@ -19,19 +19,18 @@ router.post("/", async (req, res) => {
     const existingUser = await usersCollection.findOne({ email: user.email });
 
     if (existingUser) {
-      // If user already exists, return existing user info
       return res
         .status(200)
         .send({ message: "User already exists", user: existingUser });
     }
 
-    // Handle social sign-ins
     if (user.provider) {
       const newUser = {
         name: user.name,
         email: user.email,
         createdDate: new Date().toISOString(),
         status: "active",
+        type: "user",
       };
 
       const result = await usersCollection.insertOne(newUser);
@@ -41,12 +40,11 @@ router.post("/", async (req, res) => {
       });
     }
 
-    // Handle normal user registration (with password)
     const hashedPassword = await bcrypt.hash(user.password, 10);
 
     const newUser = {
       ...user,
-      password: hashedPassword, // Store the hashed password
+      password: hashedPassword,
     };
 
     const result = await usersCollection.insertOne(newUser);
@@ -56,6 +54,27 @@ router.post("/", async (req, res) => {
     });
   } catch (error) {
     res.status(500).send({ message: "An error occurred", error });
+  }
+});
+
+// Fetch a user's type by email
+router.get("/type/:email", async (req, res) => {
+  const email = req.params.email;
+
+  try {
+    const user = await usersCollection.findOne(
+      { email },
+      { projection: { type: 1 } } // Only fetch the type field
+    );
+
+    if (!user) {
+      return res.status(404).send({ message: "User not found" });
+    }
+
+    res.send({ type: user.type });
+  } catch (error) {
+    console.error("Error fetching user type:", error);
+    res.status(500).send({ message: "Internal server error" });
   }
 });
 
