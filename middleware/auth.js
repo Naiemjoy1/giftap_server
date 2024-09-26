@@ -36,6 +36,8 @@ module.exports = { verifyToken, verifyAdmin };
 // ├── index.js
 // ├── routes/
 // │   ├── products.js
+// │   └── promos.js
+// │   └── reviews.js
 // │   └── users.js
 // ├── config/
 // │   └── db.js
