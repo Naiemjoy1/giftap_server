@@ -2,12 +2,26 @@ const express = require("express");
 const bcrypt = require("bcrypt");
 const router = express.Router();
 const { client } = require("../config/db");
+const { ObjectId } = require("mongodb");
 
 const usersCollection = client.db("giftap_DB").collection("users");
 
 // Fetch all users
 router.get("/", async (req, res) => {
   const result = await usersCollection.find().toArray();
+  res.send(result);
+});
+
+router.patch("/:id", async (req, res) => {
+  const id = req.params.id;
+  const { type } = req.body;
+  const filter = { _id: new ObjectId(id) };
+  const updateDoc = {
+    $set: {
+      type: type,
+    },
+  };
+  const result = await usersCollection.updateOne(filter, updateDoc);
   res.send(result);
 });
 
@@ -64,7 +78,7 @@ router.get("/type/:email", async (req, res) => {
   try {
     const user = await usersCollection.findOne(
       { email },
-      { projection: { type: 1 } } // Only fetch the type field
+      { projection: { type: 1 } }
     );
 
     if (!user) {
