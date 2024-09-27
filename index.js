@@ -7,7 +7,8 @@ const userRoutes = require("./routes/users");
 const reviewRoutes = require("./routes/reviews");
 const promoRoutes = require("./routes/promos");
 const chatRoutes = require("./routes/chats");
-const http = require("http");
+const applyRoutes = require("./routes/applys");
+const http = require("http"); //will check after
 const { Server } = require("socket.io");
 
 const app = express();
@@ -38,6 +39,7 @@ app.use("/review", reviewRoutes);
 app.use("/users", userRoutes);
 app.use("/promos", promoRoutes);
 app.use("/chats", chatRoutes);
+app.use("/applys", applyRoutes);
 
 app.get("/", (req, res) => {
   res.send("giftap Server Running");
