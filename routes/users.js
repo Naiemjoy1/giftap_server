@@ -14,10 +14,15 @@ router.get("/", async (req, res) => {
 
 router.patch("/:id", async (req, res) => {
   const id = req.params.id;
-  const { type } = req.body;
+  const { name, displayName, image, type } = req.body;
+  console.log(name);
+
   const filter = { _id: new ObjectId(id) };
   const updateDoc = {
     $set: {
+      name: name,
+      displayName: displayName,
+      image: image,
       type: type,
     },
   };
