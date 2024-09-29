@@ -1,7 +1,7 @@
 const express = require("express");
 const router = express.Router();
 const { client } = require("../config/db");
-const { ObjectId } = require("mongodb"); // Import ObjectId to use it for comparisons
+const { ObjectId } = require("mongodb");
 const recentviewCollection = client.db("giftap_DB").collection("recentview");
 
 router.get("/", async (req, res) => {
@@ -19,11 +19,10 @@ router.post("/", async (req, res) => {
     });
 
     if (existingProduct) {
-      await recentviewCollection.deleteOne({ _id: objectId });
+      await recentviewCollection.deleteOne({ _id: new ObjectId(productId) });
       console.log(`Deleted existing product with _id: ${productId}`);
     }
 
-    // Insert the new product
     const result = await recentviewCollection.insertOne(info);
     res.status(201).send(result);
   } catch (error) {
