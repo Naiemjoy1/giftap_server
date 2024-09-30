@@ -12,11 +12,16 @@ router.get("/", async (req, res) => {
   res.send(result);
 });
 
+router.get("/:id", async (req, res) => {
+  const id = req.params.id;
+  const query = { _id: new ObjectId(id) };
+  const result = await usersCollection.findOne(query);
+  res.send(result);
+});
+
 router.patch("/:id", async (req, res) => {
   const id = req.params.id;
   const { name, displayName, image, type } = req.body;
-  console.log(name);
-
   const filter = { _id: new ObjectId(id) };
   const updateDoc = {
     $set: {
