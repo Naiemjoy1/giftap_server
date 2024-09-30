@@ -9,7 +9,7 @@ const promoRoutes = require("./routes/promos");
 const chatRoutes = require("./routes/chats");
 const applyRoutes = require("./routes/applys");
 const recentview = require("./routes/recentview");
-const http = require("http"); //will check later
+const http = require("http");
 const { Server } = require("socket.io");
 
 const app = express();
@@ -57,6 +57,11 @@ const io = new Server(server, {
 io.on("connection", (socket) => {
   console.log("A user connected: " + socket.id);
 
+  // Listen for errors
+  socket.on("error", (err) => {
+    console.error("Socket error: ", err);
+  });
+
   // Listen for messages
   socket.on("sendMessage", (data) => {
     console.log("Message received: ", data);
@@ -64,12 +69,22 @@ io.on("connection", (socket) => {
   });
 
   // Handle disconnection
-  socket.on("disconnect", () => {
-    console.log("A user disconnected: " + socket.id);
+  socket.on("disconnect", (reason) => {
+    console.log("A user disconnected: " + socket.id, "Reason:", reason);
   });
 });
 
 // Listen on the server
 server.listen(port, () => {
   console.log(`giftap sitting on server port ${port}`);
+});
+
+// Catch unhandled promise rejections
+process.on("unhandledRejection", (reason, promise) => {
+  console.log("Unhandled Rejection at:", promise, "reason:", reason);
+});
+
+// Catch uncaught exceptions
+process.on("uncaughtException", (err) => {
+  console.error("There was an uncaught error:", err);
 });
