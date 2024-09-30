@@ -21,14 +21,11 @@ const server = http.createServer(app);
 // Middleware
 app.use(
   cors({
-    origin: [
-      "http://localhost:5173",
-      "https://giftap901.web.app",
-      "https://giftap901.firebaseapp.com",
-    ],
+    origin: ["http://localhost:5173", "https://giftap901.web.app"],
     credentials: true,
   })
 );
+
 app.use(express.json());
 
 // Connect to the database
@@ -50,11 +47,7 @@ app.get("/", (req, res) => {
 // Initialize Socket.io
 const io = new Server(server, {
   cors: {
-    origin: [
-      "http://localhost:5173",
-      "https://giftap901.web.app",
-      "https://giftap901.firebaseapp.com",
-    ],
+    origin: ["http://localhost:5173", "https://giftap901.web.app"],
     methods: ["GET", "POST"],
     credentials: true,
   },
@@ -67,8 +60,7 @@ io.on("connection", (socket) => {
   // Listen for messages
   socket.on("sendMessage", (data) => {
     console.log("Message received: ", data);
-    // Broadcast message to all connected clients
-    io.emit("receiveMessage", data);
+    io.emit("receiveMessage", data); // Broadcast message to all clients
   });
 
   // Handle disconnection
