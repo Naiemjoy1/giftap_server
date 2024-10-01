@@ -12,12 +12,19 @@ router.get("/", async (req, res) => {
   res.send(result);
 });
 
+router.get("/:id", async (req, res) => {
+  const id = req.params.id;
+  const query = { _id: new ObjectId(id) };
+  const result = await usersCollection.findOne(query);
+  res.send(result);
+});
+
 router.patch("/:id", async (req, res) => {
   const id = req.params.id;
-  const { name, displayName, image, type } = req.body;
-  console.log(name);
+  const { name, displayName, image, type, address } = req.body;
 
   const filter = { _id: new ObjectId(id) };
+
   const updateDoc = {
     $set: {
       name: name,
@@ -25,9 +32,24 @@ router.patch("/:id", async (req, res) => {
       image: image,
       type: type,
     },
+    $set: {
+      "address.billing": address.billing,
+      "address.shipping": address.shipping,
+    },
   };
-  const result = await usersCollection.updateOne(filter, updateDoc);
-  res.send(result);
+
+  try {
+    const result = await usersCollection.updateOne(filter, updateDoc);
+    if (result.modifiedCount === 0) {
+      return res
+        .status(404)
+        .send({ message: "User not found or no changes made" });
+    }
+    res.send(result);
+  } catch (error) {
+    console.error("Error updating user:", error);
+    res.status(500).send({ message: "An error occurred", error });
+  }
 });
 
 // Create or sign in a user

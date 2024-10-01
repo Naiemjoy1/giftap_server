@@ -22,14 +22,11 @@ const server = http.createServer(app);
 // Middleware
 app.use(
   cors({
-    origin: [
-      "http://localhost:5173",
-      "https://giftap901.web.app",
-      "https://giftap901.firebaseapp.com",
-    ],
+    origin: ["http://localhost:5173", "https://giftap901.web.app"],
     credentials: true,
   })
 );
+
 app.use(express.json());
 
 // Connect to the database
@@ -52,11 +49,7 @@ app.get("/", (req, res) => {
 // Initialize Socket.io
 const io = new Server(server, {
   cors: {
-    origin: [
-      "http://localhost:5173",
-      "https://giftap901.web.app",
-      "https://giftap901.firebaseapp.com",
-    ],
+    origin: ["http://localhost:5173", "https://giftap901.web.app"],
     methods: ["GET", "POST"],
     credentials: true,
   },
@@ -66,20 +59,34 @@ const io = new Server(server, {
 io.on("connection", (socket) => {
   console.log("A user connected: " + socket.id);
 
+  // Listen for errors
+  socket.on("error", (err) => {
+    console.error("Socket error: ", err);
+  });
+
   // Listen for messages
   socket.on("sendMessage", (data) => {
     console.log("Message received: ", data);
-    // Broadcast message to all connected clients
-    io.emit("receiveMessage", data);
+    io.emit("receiveMessage", data); // Broadcast message to all clients
   });
 
   // Handle disconnection
-  socket.on("disconnect", () => {
-    console.log("A user disconnected: " + socket.id);
+  socket.on("disconnect", (reason) => {
+    console.log("A user disconnected: " + socket.id, "Reason:", reason);
   });
 });
 
 // Listen on the server
 server.listen(port, () => {
   console.log(`giftap sitting on server port ${port}`);
+});
+
+// Catch unhandled promise rejections
+process.on("unhandledRejection", (reason, promise) => {
+  console.log("Unhandled Rejection at:", promise, "reason:", reason);
+});
+
+// Catch uncaught exceptions
+process.on("uncaughtException", (err) => {
+  console.error("There was an uncaught error:", err);
 });
