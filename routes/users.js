@@ -34,6 +34,7 @@ router.patch("/:id", async (req, res) => {
     },
     $set: {
       "address.billing": address.billing,
+      "address.shipping": address.shipping,
     },
   };
 
