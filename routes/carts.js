@@ -44,6 +44,19 @@ router.post("/", async (req, res) => {
   }
 });
 
+router.patch("/:id", async (req, res) => {
+  const id = req.params.id;
+  const filter = { _id: new ObjectId(id) };
+  const message = req.body.message;
+  const updateDoc = {
+    $set: {
+      message: message,
+    },
+  };
+  const result = await cartsCollection.updateOne(filter, updateDoc);
+  res.send(result);
+});
+
 router.delete("/:id", async (req, res) => {
   const id = req.params.id;
   const query = { _id: new ObjectId(id) };
