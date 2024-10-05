@@ -12,7 +12,8 @@ const recentview = require("./routes/recentview");
 const blogsRouters = require("./routes/blogs");
 const catrsRouters = require("./routes/carts");
 const wishlistsRouters = require("./routes/wishlists");
-const http = require("http"); //will check later
+const paymentssRouters = require("./routes/payments");
+const http = require("http");
 const { Server } = require("socket.io");
 
 const app = express();
@@ -30,6 +31,7 @@ app.use(
 );
 
 app.use(express.json());
+app.use(express.urlencoded({ extended: true }));
 
 // Connect to the database
 connectDB();
@@ -45,6 +47,7 @@ app.use("/recentviews", recentview);
 app.use("/blogs", blogsRouters);
 app.use("/carts", catrsRouters);
 app.use("/wishlists", wishlistsRouters);
+app.use("/payments", paymentssRouters);
 
 app.get("/", (req, res) => {
   res.send("giftap Server Running");
