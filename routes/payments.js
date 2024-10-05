@@ -65,6 +65,7 @@ router.post("/", async (req, res) => {
         date: new Date(),
         cartIds: paymentssl.cartIds,
         productId: paymentssl.productId,
+        delivery: paymentssl.delivery,
       };
 
       await paymentCollection.insertOne(saveData);
