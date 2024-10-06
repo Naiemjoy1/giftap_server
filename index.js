@@ -13,6 +13,7 @@ const blogsRouters = require("./routes/blogs");
 const catrsRouters = require("./routes/carts");
 const wishlistsRouters = require("./routes/wishlists");
 const paymentssRouters = require("./routes/payments");
+const emailRoutes = require("./routes/email");
 const http = require("http");
 const { Server } = require("socket.io");
 
@@ -27,6 +28,7 @@ app.use(
   cors({
     origin: ["http://localhost:5173", "https://giftap901.web.app"],
     credentials: true,
+    methods: ["GET", "POST", "PUT", "PATCH", "DELETE"],
   })
 );
 
@@ -48,6 +50,7 @@ app.use("/blogs", blogsRouters);
 app.use("/carts", catrsRouters);
 app.use("/wishlists", wishlistsRouters);
 app.use("/payments", paymentssRouters);
+app.use("/email", emailRoutes);
 
 app.get("/", (req, res) => {
   res.send("giftap Server Running");
