@@ -46,13 +46,16 @@ router.post("/", async (req, res) => {
 
 router.patch("/:id", async (req, res) => {
   const id = req.params.id;
+  const { message, delivery } = req.body;
+
   const filter = { _id: new ObjectId(id) };
-  const message = req.body.message;
   const updateDoc = {
     $set: {
       message: message,
+      delivery: delivery,
     },
   };
+
   const result = await cartsCollection.updateOne(filter, updateDoc);
   res.send(result);
 });
