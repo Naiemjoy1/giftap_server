@@ -136,9 +136,7 @@ router.post("/success-payment", async (req, res) => {
         const currentDeliveryTime = delivery[index];
         const currentMessage = message[index];
 
-        // Check for instant delivery
         if (currentDeliveryTime === "instant") {
-          // Send instant delivery email
           await sendDeliveryEmail(
             shippingEmail,
             currentProductId,
@@ -148,7 +146,6 @@ router.post("/success-payment", async (req, res) => {
         } else {
           const deliveryDate = new Date(currentDeliveryTime);
           if (deliveryDate > new Date()) {
-            // Schedule delivery email
             schedule.scheduleJob(deliveryDate, async () => {
               try {
                 console.log(
