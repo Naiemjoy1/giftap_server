@@ -10,7 +10,6 @@ const transporter = nodemailer.createTransport({
   },
 });
 
-// Define email subjects as constants
 const EMAIL_SUBJECTS = {
   PAYMENT_CONFIRMATION: "Payment Confirmation",
   DELIVERY_CONFIRMATION: "Delivery Confirmation",
@@ -32,7 +31,7 @@ const sendPaymentConfirmationEmail = async (customerEmail, paymentId) => {
     );
   } catch (error) {
     console.error("Error sending payment confirmation email:", error.message);
-    throw error; // Rethrow to handle further up the chain if necessary
+    throw error;
   }
 };
 
@@ -43,7 +42,7 @@ const sendDeliveryEmail = async (
   currentMessage = ""
 ) => {
   const mailOptions = {
-    from: process.env.EMAIL_USER,
+    from: `"Giftap" <${process.env.EMAIL_USER}>`,
     to: shippingEmail,
     subject: EMAIL_SUBJECTS.DELIVERY_CONFIRMATION,
     text: `Dear Customer,\n\nYour product with ID: ${currentProductId} has been successfully delivered.\nTransaction ID: ${paymentId}${
@@ -56,7 +55,7 @@ const sendDeliveryEmail = async (
     console.log("Delivery email sent successfully to:", shippingEmail);
   } catch (error) {
     console.error("Error sending delivery email:", error.message);
-    throw error; // Rethrow to handle further up the chain if necessary
+    throw error;
   }
 };
 
