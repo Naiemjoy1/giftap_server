@@ -70,6 +70,7 @@ router.post("/", async (req, res) => {
         delivery: paymentssl.delivery,
         user: paymentssl.user,
         message: paymentssl.message,
+        shippingEmail: paymentssl.shippingEmail,
       };
 
       await paymentCollection.insertOne(saveData);
@@ -113,15 +114,7 @@ router.post("/success-payment", async (req, res) => {
 
     const payment = await paymentCollection.findOne(query);
     if (payment) {
-      const deleteQuery = {
-        _id: { $in: payment.cartIds.map((id) => new ObjectId(id)) },
-      };
-
-      //   console.log("Deleting cart items for cartIds:", payment.cartIds);
-      const deleteResult = await cartsCollection.deleteMany(deleteQuery);
-      //   console.log("Deleted cart items:", deleteResult);
-
-      const shippingEmail = payment.user?.address?.shipping[0]?.email;
+      const shippingEmail = payment.shippingEmail;
       if (!shippingEmail) {
         console.error("No shipping email found.");
         throw new Error("Shipping email not found.");
@@ -136,26 +129,39 @@ router.post("/success-payment", async (req, res) => {
         const currentDeliveryTime = delivery[index];
         const currentMessage = message[index];
 
+        console.log(
+          `Processing product ${currentProductId}, delivery: ${currentDeliveryTime}`
+        );
+
         if (currentDeliveryTime === "instant") {
+          console.log(`Instant delivery for product ${currentProductId}`);
           await sendDeliveryEmail(
             shippingEmail,
             currentProductId,
             payment.paymentId,
             currentMessage
           );
+
+          await paymentCollection.updateOne(
+            { paymentId: payment.paymentId, productId: currentProductId },
+            { $set: { [`delivery.${index}`]: "delivered" } }
+          );
         } else {
           const deliveryDate = new Date(currentDeliveryTime);
+          console.log(`Scheduled delivery date: ${deliveryDate}`);
           if (deliveryDate > new Date()) {
             schedule.scheduleJob(deliveryDate, async () => {
               try {
-                console.log(
-                  `Sending scheduled delivery email for product ${currentProductId} to shipping email ${shippingEmail}`
-                );
                 await sendDeliveryEmail(
                   shippingEmail,
                   currentProductId,
                   payment.paymentId,
                   currentMessage
+                );
+
+                await paymentCollection.updateOne(
+                  { paymentId: payment.paymentId, productId: currentProductId },
+                  { $set: { [`delivery.${index}`]: "delivered" } }
                 );
               } catch (error) {
                 console.error("Error sending scheduled delivery email:", error);
@@ -166,6 +172,12 @@ router.post("/success-payment", async (req, res) => {
           }
         }
       }
+
+      const deleteQuery = {
+        _id: { $in: payment.cartIds.map((id) => new ObjectId(id)) },
+      };
+      const deleteResult = await cartsCollection.deleteMany(deleteQuery);
+      console.log("Deleted cart items:", deleteResult);
     }
 
     res.redirect("http://localhost:5173/shop");
