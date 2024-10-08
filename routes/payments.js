@@ -8,6 +8,7 @@ const { sendPaymentConfirmationEmail, sendDeliveryEmail } = require("./email");
 
 const paymentCollection = client.db("giftap_DB").collection("payments");
 const cartsCollection = client.db("giftap_DB").collection("carts");
+const productCollection = client.db("giftap_DB").collection("products");
 
 router.get("/", async (req, res) => {
   const result = await paymentCollection.find().toArray();
@@ -71,6 +72,9 @@ router.post("/", async (req, res) => {
         user: paymentssl.user,
         message: paymentssl.message,
         shippingEmail: paymentssl.shippingEmail,
+        quantities: paymentssl.quantities,
+        category: paymentssl.category,
+        tier: paymentssl.tier,
       };
 
       await paymentCollection.insertOne(saveData);
@@ -122,54 +126,94 @@ router.post("/success-payment", async (req, res) => {
 
       await sendPaymentConfirmationEmail(payment.cus_email, payment.paymentId);
 
-      const { productId, delivery, message } = payment;
+      const { productId, delivery, message, quantities, category, tier } =
+        payment;
 
       for (let index = 0; index < productId.length; index++) {
         const currentProductId = productId[index];
         const currentDeliveryTime = delivery[index];
         const currentMessage = message[index];
+        const currentQuantity = quantities[index];
+        const currentCategory = category[index];
+        const currentTier = tier[index];
 
         console.log(
-          `Processing product ${currentProductId}, delivery: ${currentDeliveryTime}`
+          `Processing product ${currentProductId}, delivery: ${currentDeliveryTime}, Message: ${currentMessage}, Quantity: ${currentQuantity}, Category:${currentCategory},Tier:${currentTier}`
         );
 
-        if (currentDeliveryTime === "instant") {
-          console.log(`Instant delivery for product ${currentProductId}`);
-          await sendDeliveryEmail(
-            shippingEmail,
-            currentProductId,
-            payment.paymentId,
-            currentMessage
-          );
+        const product = await productCollection.findOne({
+          _id: new ObjectId(currentProductId),
+        });
 
-          await paymentCollection.updateOne(
-            { paymentId: payment.paymentId, productId: currentProductId },
-            { $set: { [`delivery.${index}`]: "delivered" } }
-          );
-        } else {
-          const deliveryDate = new Date(currentDeliveryTime);
-          console.log(`Scheduled delivery date: ${deliveryDate}`);
-          if (deliveryDate > new Date()) {
-            schedule.scheduleJob(deliveryDate, async () => {
-              try {
-                await sendDeliveryEmail(
-                  shippingEmail,
-                  currentProductId,
-                  payment.paymentId,
-                  currentMessage
-                );
-
-                await paymentCollection.updateOne(
-                  { paymentId: payment.paymentId, productId: currentProductId },
-                  { $set: { [`delivery.${index}`]: "delivered" } }
-                );
-              } catch (error) {
-                console.error("Error sending scheduled delivery email:", error);
-              }
-            });
+        if (product) {
+          if (currentCategory === "digital gift") {
+            const priceGroup = product.priceGroup.find(
+              (pg) => pg.tier === currentTier
+            );
+            if (priceGroup) {
+              await productCollection.updateOne(
+                {
+                  _id: new ObjectId(currentProductId),
+                  "priceGroup.tier": currentTier,
+                },
+                { $inc: { "priceGroup.$.quantity": -currentQuantity } }
+              );
+            } else {
+              console.error("Price group not found for the current tier.");
+            }
           } else {
-            console.error("Scheduled delivery time is in the past.");
+            await productCollection.updateOne(
+              { _id: new ObjectId(currentProductId) },
+              { $inc: { quantity: -currentQuantity } }
+            );
           }
+
+          if (currentDeliveryTime === "instant") {
+            console.log(`Instant delivery for product ${currentProductId}`);
+            await sendDeliveryEmail(
+              shippingEmail,
+              currentProductId,
+              payment.paymentId,
+              currentMessage
+            );
+
+            await paymentCollection.updateOne(
+              { paymentId: payment.paymentId, productId: currentProductId },
+              { $set: { [`delivery.${index}`]: "delivered" } }
+            );
+          } else {
+            const deliveryDate = new Date(currentDeliveryTime);
+            console.log(`Scheduled delivery date: ${deliveryDate}`);
+            if (deliveryDate > new Date()) {
+              schedule.scheduleJob(deliveryDate, async () => {
+                try {
+                  await sendDeliveryEmail(
+                    shippingEmail,
+                    currentProductId,
+                    payment.paymentId,
+                    currentMessage
+                  );
+
+                  await paymentCollection.updateOne(
+                    {
+                      paymentId: payment.paymentId,
+                      productId: currentProductId,
+                    },
+                    { $set: { [`delivery.${index}`]: "delivered" } }
+                  );
+                } catch (error) {
+                  console.error(
+                    "Error sending scheduled delivery email:",
+                    error
+                  );
+                }
+              });
+            } else {
+              console.error("Scheduled delivery time is in the past.");
+            }
+          }
+        } else {
+          console.error("Product not found.");
         }
       }
 
