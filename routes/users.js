@@ -25,16 +25,17 @@ router.patch("/:id", async (req, res) => {
 
   const filter = { _id: new ObjectId(id) };
 
+  // Construct the update document
   const updateDoc = {
     $set: {
-      name: name,
-      displayName: displayName,
-      image: image,
-      type: type,
-    },
-    $set: {
-      "address.billing": address.billing,
-      "address.shipping": address.shipping,
+      name,
+      displayName,
+      image,
+      type,
+      ...(address && {
+        "address.billing": address.billing,
+        "address.shipping": address.shipping,
+      }),
     },
   };
 
