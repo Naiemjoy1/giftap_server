@@ -91,4 +91,8 @@ process.on("unhandledRejection", (reason, promise) => {
 
 process.on("uncaughtException", (err) => {
   console.error("There was an uncaught error:", err);
+<<<<<<< HEAD
 });
+=======
+});
+>>>>>>> 1f9d05599b904a11fa69cb6ce451c5ad358ec99e
