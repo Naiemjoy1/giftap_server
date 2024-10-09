@@ -22,7 +22,7 @@ router.post('/', async (req, res) => {
 
     if (existingProduct) {
       
-      await recentviewCollection.deleteOne({ _id: objectId });
+      await recentviewCollection.deleteOne({ id: productId });
       console.log(`Deleted existing product with _id: ${productId}`);
     }
 
