@@ -14,6 +14,7 @@ const catrsRouters = require("./routes/carts");
 const wishlistsRouters = require("./routes/wishlists");
 const paymentssRouters = require("./routes/payments");
 const emailRoutes = require("./routes/email");
+const sellersRoutes = require("./routes/sellers");
 const http = require("http");
 const { Server } = require("socket.io");
 
@@ -51,6 +52,7 @@ app.use("/carts", catrsRouters);
 app.use("/wishlists", wishlistsRouters);
 app.use("/payments", paymentssRouters);
 app.use("/email", emailRoutes);
+app.use("/sellers", sellersRoutes);
 
 app.get("/", (req, res) => {
   res.send("giftap Server Running");
