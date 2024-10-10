@@ -17,6 +17,23 @@ router.get("/:id", async (req, res) => {
   res.send(result);
 });
 
+router.post("/", async (req, res) => {
+  const productData = req.body;
+  const result = await productCollection.insertOne(productData);
+  res.send(result);
+});
+
+router.put("/:id", async (req, res) => {
+  const id = req.params.id;
+  const productData = req.body;
+  const query = { _id: new ObjectId(id) };
+  const updateDoc = {
+    $set: productData,
+  };
+  const result = await productCollection.updateOne(query, updateDoc);
+  res.send(result);
+});
+
 router.delete("/:id", async (req, res) => {
   const id = req.params.id;
   const query = { _id: new ObjectId(id) };
