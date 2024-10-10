@@ -25,7 +25,7 @@ router.get("/:id/blogComments", async (req, res) => {
   res.send(result);
 });
 
-
+// Blog Comment Added
 router.post("/:id/comments", async (req, res) => {
   const blogId = req.params.id;
   const newComment = req.body; 
