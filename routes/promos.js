@@ -6,7 +6,6 @@ const { ObjectId } = require("mongodb");
 const promoCollection = client.db("giftap_DB").collection("promos");
 
 router.get("/", async (req, res) => {
-  // Ensure the promo statuses are updated before fetching
   await updatePromoStatuses();
   const result = await promoCollection.find().toArray();
   res.send(result);
