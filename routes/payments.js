@@ -239,4 +239,42 @@ router.post("/cancel", async (req, res) => {
   res.redirect("http://localhost:5173/shop");
 });
 
+router.patch("/", async (req, res) => {
+  const { productId, deliveryStatus } = req.body;
+
+  try {
+    const paymentData = await paymentCollection.findOne({
+      productId: { $in: [productId] },
+    });
+
+    if (!paymentData) {
+      return res
+        .status(404)
+        .json({ success: false, message: "Payment not found" });
+    }
+
+    const productIndex = paymentData.productId.indexOf(productId);
+
+    if (productIndex === -1) {
+      return res
+        .status(400)
+        .json({ success: false, message: "Product not found in payment" });
+    }
+
+    paymentData.delivery[productIndex] = deliveryStatus;
+
+    await paymentCollection.updateOne(
+      { _id: paymentData._id },
+      { $set: { delivery: paymentData.delivery } }
+    );
+
+    res.json({ success: true, message: "Delivery status updated" });
+  } catch (error) {
+    console.error("Error updating delivery status:", error.message);
+    res
+      .status(500)
+      .json({ success: false, message: "Failed to update delivery status" });
+  }
+});
+
 module.exports = router;
