@@ -26,7 +26,7 @@ const server = http.createServer(app);
 // Middleware
 app.use(
   cors({
-    origin: ["http://localhost:5173", "https://giftap901.web.app"],
+    origin: ["http://localhost:5173", "http://localhost:5174", "https://giftap901.web.app"],
     credentials: true,
     methods: ["GET", "POST", "PUT", "PATCH", "DELETE"],
   })

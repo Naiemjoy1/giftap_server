@@ -6,7 +6,14 @@ const { client } = require("../config/db");
 const blogCollection = client.db("giftap_DB").collection("blogs");
 
 router.get("/", async (req, res) => {
-  const result = await blogCollection.find().toArray();
+
+  const filter = req.query
+  // console.log(filter)
+
+  const query = {
+    blogTitle: { $regex: filter.search, $options: "i" }
+  }
+  const result = await blogCollection.find(query).toArray();
   res.send(result);
 });
 
@@ -28,7 +35,7 @@ router.get("/:id/blogComments", async (req, res) => {
 // Blog Comment Added
 router.post("/:id/comments", async (req, res) => {
   const blogId = req.params.id;
-  const newComment = req.body; 
+  const newComment = req.body;
 
   try {
     const result = await blogCollection.updateOne(
@@ -46,6 +53,6 @@ router.post("/:id/comments", async (req, res) => {
   }
 });
 
- 
+
 
 module.exports = router;
