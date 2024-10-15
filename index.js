@@ -4,7 +4,6 @@ require("dotenv").config();
 const { connectDB } = require("./config/db");
 const productRoutes = require("./routes/products");
 const userRoutes = require("./routes/users");
-const reviewRoutes = require("./routes/reviews");
 const promoRoutes = require("./routes/promos");
 const chatRoutes = require("./routes/chats");
 const applyRoutes = require("./routes/applys");
@@ -42,7 +41,6 @@ connectDB();
 
 // Use routes
 app.use("/products", productRoutes);
-app.use("/review", reviewRoutes);
 app.use("/users", userRoutes);
 app.use("/promos", promoRoutes);
 app.use("/chats", chatRoutes);
