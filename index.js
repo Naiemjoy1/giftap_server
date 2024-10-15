@@ -4,7 +4,6 @@ require("dotenv").config();
 const { connectDB } = require("./config/db");
 const productRoutes = require("./routes/products");
 const userRoutes = require("./routes/users");
-const reviewRoutes = require("./routes/reviews");
 const promoRoutes = require("./routes/promos");
 const chatRoutes = require("./routes/chats");
 const applyRoutes = require("./routes/applys");
@@ -14,6 +13,8 @@ const catrsRouters = require("./routes/carts");
 const wishlistsRouters = require("./routes/wishlists");
 const paymentssRouters = require("./routes/payments");
 const emailRoutes = require("./routes/email");
+const sellersRoutes = require("./routes/sellers");
+const reviewsRoutes = require("./routes/reviews");
 const http = require("http");
 const { Server } = require("socket.io");
 
@@ -40,7 +41,6 @@ connectDB();
 
 // Use routes
 app.use("/products", productRoutes);
-app.use("/review", reviewRoutes);
 app.use("/users", userRoutes);
 app.use("/promos", promoRoutes);
 app.use("/chats", chatRoutes);
@@ -51,6 +51,8 @@ app.use("/carts", catrsRouters);
 app.use("/wishlists", wishlistsRouters);
 app.use("/payments", paymentssRouters);
 app.use("/email", emailRoutes);
+app.use("/sellers", sellersRoutes);
+app.use("/reviews", reviewsRoutes);
 
 app.get("/", (req, res) => {
   res.send("giftap Server Running");
