@@ -30,4 +30,11 @@ router.delete("/:id", async (req, res) => {
   res.send(result);
 });
 
+router.delete("/product/:productId", async (req, res) => {
+  const productId = req.params.productId;
+  const query = { productId: productId };
+  const result = await wishlistCollection.deleteOne(query);
+  res.send(result);
+});
+
 module.exports = router;
