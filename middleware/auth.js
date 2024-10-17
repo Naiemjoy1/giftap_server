@@ -1,9 +1,17 @@
+// middleware/auth.js
 const jwt = require("jsonwebtoken");
-const { client } = require("../config/db");
+const { usersCollection } = require("../models/User");
 
-const usersCollection = client.db("giftap_DB").collection("users");
+// Generate JWT Token
+app.post("/jwt", async (req, res) => {
+  const user = req.body;
+  const token = jwt.sign(user, process.env.ACCESS_TOKEN_SECRET, {
+    expiresIn: "1h",
+  });
+  res.send({ token });
+});
 
-// Middleware: Verify JWT token
+// Verify JWT Token Middleware
 const verifyToken = (req, res, next) => {
   const authorization = req.headers.authorization;
   if (!authorization) {
@@ -19,7 +27,7 @@ const verifyToken = (req, res, next) => {
   });
 };
 
-// Middleware: Verify Admin
+// Verify Admin Middleware
 const verifyAdmin = async (req, res, next) => {
   const email = req.decoded.email;
   const user = await usersCollection.findOne({ email });
@@ -30,18 +38,3 @@ const verifyAdmin = async (req, res, next) => {
 };
 
 module.exports = { verifyToken, verifyAdmin };
-
-// giftap_server/
-// │
-// ├── index.js
-// ├── routes/
-// │   ├── products.js
-// │   └── promos.js
-// │   └── reviews.js
-// │   └── users.js
-// ├── config/
-// │   └── db.js
-// └── middleware/
-//     └── auth.js
-
-// Comment Added By Rasel
