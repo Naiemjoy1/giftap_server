@@ -58,6 +58,7 @@ app.get("/", (req, res) => {
   res.send("giftap Server Running");
 });
 
+// Initialize socket.io
 const io = new Server(server, {
   cors: {
     origin: ["http://localhost:5173", "https://giftap901.web.app"],
@@ -76,6 +77,11 @@ io.on("connection", (socket) => {
   socket.on("sendMessage", (data) => {
     console.log("Message received: ", data);
     io.emit("receiveMessage", data);
+  });
+
+  socket.on("chatEnded", (data) => {
+    console.log("Chat ended for chat ID: ", data.chatId);
+    io.emit("chatEnded", { chatId: data.chatId });
   });
 
   socket.on("disconnect", (reason) => {
