@@ -2,6 +2,7 @@ const express = require("express");
 const router = express.Router();
 const { ObjectId } = require("mongodb");
 const { client } = require("../config/db");
+const { verifyToken } = require("../middleware/auth");
 
 const cartsCollection = client.db("giftap_DB").collection("carts");
 
@@ -44,7 +45,7 @@ router.post("/", async (req, res) => {
   }
 });
 
-router.patch("/:id", async (req, res) => {
+router.patch("/:id", verifyToken, async (req, res) => {
   const id = req.params.id;
   const { message, delivery } = req.body;
 
@@ -60,7 +61,7 @@ router.patch("/:id", async (req, res) => {
   res.send(result);
 });
 
-router.delete("/:id", async (req, res) => {
+router.delete("/:id", verifyToken, async (req, res) => {
   const id = req.params.id;
   const query = { _id: new ObjectId(id) };
   const result = await cartsCollection.deleteOne(query);
