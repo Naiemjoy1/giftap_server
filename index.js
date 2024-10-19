@@ -15,6 +15,7 @@ const paymentRoutes = require("./routes/payments");
 const emailRoutes = require("./routes/email");
 const sellerRoutes = require("./routes/sellers");
 const reviewRoutes = require("./routes/reviews");
+const adminRoutes = require("./routes/admin");
 const http = require("http");
 const { Server } = require("socket.io");
 const jwt = require("jsonwebtoken");
@@ -49,6 +50,7 @@ app.post("/jwt", async (req, res) => {
 });
 
 // Use routes
+app.use("/admin", adminRoutes);
 app.use("/products", productRoutes);
 app.use("/users", userRoutes);
 app.use("/promos", promoRoutes);
