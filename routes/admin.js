@@ -35,9 +35,7 @@ router.get("/statistics", async (req, res) => {
     const thirtyDaysAgo = new Date();
     thirtyDaysAgo.setDate(thirtyDaysAgo.getDate() - 30);
     const totalNewlyAddedProductsCount = await productCollection.countDocuments(
-      {
-        createdAt: { $gte: thirtyDaysAgo },
-      }
+      { createdAt: { $gte: thirtyDaysAgo } }
     );
 
     const deliveryStatuses = await paymentCollection
@@ -115,11 +113,35 @@ router.get("/statistics", async (req, res) => {
       .toArray();
     const previousMonthRevenue = totalPreviousMonthRevenue[0]?.total || 0;
 
+    const currentMonthSuccessfulPayments =
+      await paymentCollection.countDocuments({
+        status: "success",
+        date: { $gte: startOfCurrentMonth },
+      });
+
+    const previousMonthSuccessfulPayments =
+      await paymentCollection.countDocuments({
+        status: "success",
+        date: { $gte: startOfPreviousMonth, $lte: endOfPreviousMonth },
+      });
+
     const revenueIncrease = currentMonthRevenue - previousMonthRevenue;
     const revenueIncreasePercentage =
       previousMonthRevenue > 0
         ? ((revenueIncrease / previousMonthRevenue) * 100).toFixed(2)
         : currentMonthRevenue > 0
+        ? 100
+        : 0;
+
+    const successfulPaymentsIncrease =
+      currentMonthSuccessfulPayments - previousMonthSuccessfulPayments;
+    const successfulPaymentsIncreasePercentage =
+      previousMonthSuccessfulPayments > 0
+        ? (
+            (successfulPaymentsIncrease / previousMonthSuccessfulPayments) *
+            100
+          ).toFixed(2)
+        : currentMonthSuccessfulPayments > 0
         ? 100
         : 0;
 
@@ -134,8 +156,10 @@ router.get("/statistics", async (req, res) => {
       totalNewlyAddedProducts: totalNewlyAddedProductsCount,
       currentMonthRevenue,
       previousMonthRevenue,
-      revenueIncrease,
       revenueIncreasePercentage,
+      currentMonthSuccessfulPayments,
+      previousMonthSuccessfulPayments,
+      successfulPaymentsIncreasePercentage,
     });
   } catch (error) {
     console.error("Error fetching statistics:", error.message);
@@ -211,7 +235,7 @@ router.get("/day-wise-payments", async (req, res) => {
 
     const result = dayWisePayments.map((payment) => ({
       date: new Date(payment._id).toISOString(),
-      totalAmount: payment.totalAmount,
+      totalAmount: parseFloat(payment.totalAmount.toFixed(2)),
       count: payment.count,
     }));
 
