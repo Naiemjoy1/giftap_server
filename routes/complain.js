@@ -5,6 +5,7 @@ const { client } = require("../config/db");
 
 const complainCollection = client.db("giftap_DB").collection("complain");
 
+// Show All Complain Data
 router.get("/", async (req, res) => {
     const result = await complainCollection.find().toArray();
     res.send(result);
