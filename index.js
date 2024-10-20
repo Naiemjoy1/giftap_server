@@ -65,7 +65,7 @@ app.use("/payments", paymentRoutes);
 app.use("/email", emailRoutes);
 app.use("/sellers", sellerRoutes);
 app.use("/reviews", reviewRoutes);
-app.use("/notice", );
+app.use("/notice", noticeRoutes );
 
 // Root endpoint
 app.get("/", (req, res) => {
