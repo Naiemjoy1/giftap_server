@@ -12,6 +12,10 @@ router.get("/", async (req, res) => {
 
 
 
-);
+router.post("/", async (req, res) => {
+    const noticeData = req.body;
+    const result = await noticeCollection.insertOne(noticeData);
+    res.send(result);
+  });
 
 module.exports = router;
