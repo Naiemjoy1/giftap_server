@@ -3,16 +3,17 @@ const bcrypt = require("bcrypt");
 const router = express.Router();
 const { client } = require("../config/db");
 const { ObjectId } = require("mongodb");
+const { verifyToken } = require("../middleware/auth");
 
 const usersCollection = client.db("giftap_DB").collection("users");
 
 // Fetch all users
-router.get("/", async (req, res) => {
+router.get("/", verifyToken, async (req, res) => {
   const result = await usersCollection.find().toArray();
   res.send(result);
 });
 
-router.patch("/:id", async (req, res) => {
+router.patch("/:id", verifyToken, async (req, res) => {
   const id = req.params.id;
   const { name, displayName, image, type, address, status } = req.body;
 
@@ -46,7 +47,7 @@ router.patch("/:id", async (req, res) => {
   }
 });
 
-router.patch("/:id", async (req, res) => {
+router.patch("/:id", verifyToken, async (req, res) => {
   const id = req.params.id;
   const { name, displayName, image, type, address } = req.body;
 
@@ -147,7 +148,7 @@ router.get("/type/:email", async (req, res) => {
   }
 });
 
-router.delete("/:id", async (req, res) => {
+router.delete("/:id", verifyToken, async (req, res) => {
   const id = req.params.id;
   const query = { _id: new ObjectId(id) };
   const result = await usersCollection.deleteOne(query);
