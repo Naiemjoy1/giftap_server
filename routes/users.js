@@ -13,7 +13,7 @@ router.get("/", verifyToken, async (req, res) => {
   res.send(result);
 });
 
-router.patch("/:id", verifyToken, async (req, res) => {
+router.patch("/:id", async (req, res) => {
   const id = req.params.id;
   const { name, displayName, image, type, address, status } = req.body;
 
@@ -47,7 +47,7 @@ router.patch("/:id", verifyToken, async (req, res) => {
   }
 });
 
-router.patch("/:id", verifyToken, async (req, res) => {
+router.patch("/:id", async (req, res) => {
   const id = req.params.id;
   const { name, displayName, image, type, address } = req.body;
 
@@ -148,7 +148,7 @@ router.get("/type/:email", async (req, res) => {
   }
 });
 
-router.delete("/:id", verifyToken, async (req, res) => {
+router.delete("/:id", async (req, res) => {
   const id = req.params.id;
   const query = { _id: new ObjectId(id) };
   const result = await usersCollection.deleteOne(query);
