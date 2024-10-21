@@ -16,6 +16,7 @@ const emailRoutes = require("./routes/email");
 const sellerRoutes = require("./routes/sellers");
 const reviewRoutes = require("./routes/reviews");
 const adminRoutes = require("./routes/admin");
+const noticeRoutes = require("./routes/notice");
 const http = require("http");
 const { Server } = require("socket.io");
 const jwt = require("jsonwebtoken");
@@ -63,6 +64,7 @@ app.use("/payments", paymentRoutes);
 app.use("/email", emailRoutes);
 app.use("/sellers", sellerRoutes);
 app.use("/reviews", reviewRoutes);
+app.use("/notice", noticeRoutes );
 
 // Root endpoint
 app.get("/", (req, res) => {
@@ -120,3 +122,4 @@ process.on("unhandledRejection", (reason, promise) => {
 process.on("uncaughtException", (err) => {
   console.error("There was an uncaught error:", err);
 });
+// bnnn
