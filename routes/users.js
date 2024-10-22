@@ -132,8 +132,10 @@ router.get("/type/:email", async (req, res) => {
   const email = req.params.email;
 
   try {
+    if (!email) throw new Error("Email must be provided");
+
     const user = await usersCollection.findOne(
-      { email },
+      { email: { $regex: new RegExp(email, "i") } },
       { projection: { type: 1 } }
     );
 

@@ -30,7 +30,11 @@ const server = http.createServer(app);
 // Middleware
 app.use(
   cors({
-    origin: ["http://localhost:5173", "http://localhost:5174", "https://giftap901.web.app"],
+    origin: [
+      "http://localhost:5173",
+      "http://localhost:5174",
+      "https://giftap901.web.app",
+    ],
     credentials: true,
     methods: ["GET", "POST", "PUT", "PATCH", "DELETE"],
   })
@@ -64,7 +68,7 @@ app.use("/payments", paymentRoutes);
 app.use("/email", emailRoutes);
 app.use("/sellers", sellerRoutes);
 app.use("/reviews", reviewRoutes);
-app.use("/notice", noticeRoutes );
+app.use("/notice", noticeRoutes);
 
 // Root endpoint
 app.get("/", (req, res) => {
@@ -122,4 +126,3 @@ process.on("unhandledRejection", (reason, promise) => {
 process.on("uncaughtException", (err) => {
   console.error("There was an uncaught error:", err);
 });
-// bnnn

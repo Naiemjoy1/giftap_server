@@ -6,10 +6,9 @@ const verifyToken = (req, res, next) => {
     return res.status(401).send({ message: "Forbidden access" });
   }
   const token = req.headers.authorization.split(" ")[1];
-  console.log("Extracted token:", token); // Log the extracted token
   jwt.verify(token, process.env.ACCESS_TOKEN_SECRET, (err, decoded) => {
     if (err) {
-      console.error("Token verification failed:", err); // Log the error
+      console.error("Token verification failed:", err);
       return res.status(401).send({ message: "Forbidden access" });
     }
     req.decoded = decoded;
@@ -17,4 +16,4 @@ const verifyToken = (req, res, next) => {
   });
 };
 
-module.exports = { verifyToken} 
+module.exports = { verifyToken };
