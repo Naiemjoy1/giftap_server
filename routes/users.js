@@ -3,11 +3,12 @@ const bcrypt = require("bcrypt");
 const router = express.Router();
 const { client } = require("../config/db");
 const { ObjectId } = require("mongodb");
+const { verifyToken } = require("../middleware/auth");
 
 const usersCollection = client.db("giftap_DB").collection("users");
 
 // Fetch all users
-router.get("/", async (req, res) => {
+router.get("/", verifyToken, async (req, res) => {
   const result = await usersCollection.find().toArray();
   res.send(result);
 });
@@ -131,8 +132,10 @@ router.get("/type/:email", async (req, res) => {
   const email = req.params.email;
 
   try {
+    if (!email) throw new Error("Email must be provided");
+
     const user = await usersCollection.findOne(
-      { email },
+      { email: { $regex: new RegExp(email, "i") } },
       { projection: { type: 1 } }
     );
 
