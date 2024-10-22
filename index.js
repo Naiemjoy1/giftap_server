@@ -67,8 +67,10 @@ app.use("/carts", cartRoutes);
 app.use("/wishlists", wishlistRoutes);
 app.use("/payments", paymentRoutes);
 app.use("/email", emailRoutes);
-app.use("/sellers", sellersRoutes);
-app.use("/reviews", reviewsRoutes);
+app.use("/sellers", sellerRoutes);
+app.use("/reviews", reviewRoutes);
+app.use("/notice", noticeRoutes);
+app.use("/complain", complainRoutes);
 
 // Root endpoint
 app.get("/", (req, res) => {
