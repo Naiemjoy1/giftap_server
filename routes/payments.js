@@ -59,13 +59,16 @@ router.post("/", async (req, res) => {
     });
 
     if (response.data.GatewayPageURL) {
+      const date = new Date().toLocaleString("en-US", {
+        timeZone: "Asia/Dhaka",
+      });
       const saveData = {
         cus_name: paymentssl.name,
         cus_email: paymentssl.email,
         paymentId: trxId,
         amount: paymentssl.amount,
         status: "pending",
-        date: new Date(),
+        date: new Date(date),
         cartIds: paymentssl.cartIds,
         productId: paymentssl.productId,
         delivery: paymentssl.delivery,
