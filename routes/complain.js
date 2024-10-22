@@ -19,4 +19,14 @@ router.post("/", async (req, res) => {
 });
 
 
+// complain Delete API
+router.delete("/:id", async (req, res) => {
+    const id = req.params.id;
+    const query = { _id: new ObjectId(id) };
+    const result = await complainCollection.deleteOne(query);
+    res.send(result);
+  });
+  
+
+
 module.exports = router;
