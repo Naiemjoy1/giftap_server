@@ -18,7 +18,10 @@ router.get("/:id", async (req, res) => {
 });
 
 router.post("/", async (req, res) => {
-  const productData = req.body;
+  const productData = {
+    ...req.body,
+    createdAt: new Date(),
+  };
   const result = await productCollection.insertOne(productData);
   res.send(result);
 });
@@ -42,5 +45,3 @@ router.delete("/:id", async (req, res) => {
 });
 
 module.exports = router;
-
-
