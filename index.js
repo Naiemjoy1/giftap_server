@@ -17,6 +17,7 @@ const sellerRoutes = require("./routes/sellers");
 const reviewRoutes = require("./routes/reviews");
 const adminRoutes = require("./routes/admin");
 const noticeRoutes = require("./routes/notice");
+const complainRoutes = require("./routes/complain");
 const http = require("http");
 const { Server } = require("socket.io");
 const jwt = require("jsonwebtoken");
@@ -69,6 +70,7 @@ app.use("/email", emailRoutes);
 app.use("/sellers", sellerRoutes);
 app.use("/reviews", reviewRoutes);
 app.use("/notice", noticeRoutes);
+app.use("/complain", complainRoutes);
 
 // Root endpoint
 app.get("/", (req, res) => {
