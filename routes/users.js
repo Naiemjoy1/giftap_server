@@ -8,10 +8,19 @@ const { verifyToken } = require("../middleware/auth");
 const usersCollection = client.db("giftap_DB").collection("users");
 
 // Fetch all users
-router.get("/", verifyToken, async (req, res) => {
+router.get("/",  async (req, res) => {
   const result = await usersCollection.find().toArray();
   res.send(result);
 });
+
+// *************
+router.get('/:email', async (req, res) =>{
+  const email = req.query.email
+  // console.log(userId)
+  const query = {email: email}
+  const result = await usersCollection.find(query).toArray()
+  res.send(result)
+})
 
 router.patch("/:id", async (req, res) => {
   const id = req.params.id;

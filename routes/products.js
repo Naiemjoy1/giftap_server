@@ -17,6 +17,17 @@ router.get("/:id", async (req, res) => {
   res.send(result);
 });
 
+// *********
+router.get('/:userId"', async (req, res) =>{
+  const userId = req.query.userId
+  console.log(userId)
+  const query = {userId: userId}
+  const result = await productCollection.find(query).toArray()
+  res.send(result)
+})
+
+
+
 router.post("/", async (req, res) => {
   const productData = {
     ...req.body,

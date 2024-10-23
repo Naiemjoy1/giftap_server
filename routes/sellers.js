@@ -5,6 +5,7 @@ const { ObjectId } = require("mongodb");
 
 const sellerCollection = client.db("giftap_DB").collection("sellers");
 const applyCollection = client.db("giftap_DB").collection("applys");
+// const productsCollection = client.db("giftap_DB").collection("products");
 
 router.get("/", async (req, res) => {
   const result = await sellerCollection.find().toArray();
@@ -17,6 +18,20 @@ router.get("/:id", async (req, res) => {
   const result = await sellerCollection.findOne(query);
   res.send(result);
 });
+
+// router.get('/product', async (req, res) =>{
+//   // const userId = req.query.userId
+//   // const query = {userId: userId}
+//   const result = await productsCollection.find().toArray()
+//   res.send(result)
+// })
+
+// app.get('/favorite', async(req,res) =>{
+//   const email = req.query.email
+//   const query = {email: email}
+//   const result = await favoriteCollection.find(query).toArray();
+//   res.send(result)
+// })
 
 router.post("/", async (req, res) => {
   const sellerData = req.body;
