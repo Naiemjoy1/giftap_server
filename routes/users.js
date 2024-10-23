@@ -8,7 +8,7 @@ const { verifyToken } = require("../middleware/auth");
 const usersCollection = client.db("giftap_DB").collection("users");
 
 // Fetch all users
-router.get("/", verifyToken, async (req, res) => {
+router.get("/", async (req, res) => {
   const result = await usersCollection.find().toArray();
   res.send(result);
 });

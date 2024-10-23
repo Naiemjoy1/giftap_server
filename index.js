@@ -35,6 +35,7 @@ app.use(
       "http://localhost:5173",
       "http://localhost:5174",
       "https://giftap901.web.app",
+      "https://giftap901.firebaseapp.com",
     ],
     credentials: true,
     methods: ["GET", "POST", "PUT", "PATCH", "DELETE"],
