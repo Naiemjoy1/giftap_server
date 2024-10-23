@@ -52,6 +52,13 @@ router.patch('/:id', async (req, res) => {
     }
 });
 
+router.delete("/:id", async (req, res) => {
+    const id = req.params.id;
+    const query = { _id: new ObjectId(id) };
+    const result = await bannerCollection.deleteOne(query);
+    res.send(result);
+  });
+
 
 
 module.exports = router;
