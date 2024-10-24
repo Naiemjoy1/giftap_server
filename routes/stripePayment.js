@@ -11,7 +11,7 @@ router.post('/create-payment-intent', async (req, res) => {
     try {
         const { price } = req.body;
         const amount = parseInt(price * 100)
-        console.log(amount, 'inside of the amount')
+        // console.log(amount, 'inside of the amount')
         const paymentIntent = await stripe.paymentIntents.create({
             amount: amount,
             currency: 'usd',
