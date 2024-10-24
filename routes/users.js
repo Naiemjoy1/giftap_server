@@ -8,7 +8,7 @@ const { verifyToken } = require("../middleware/auth");
 const usersCollection = client.db("giftap_DB").collection("users");
 
 // Fetch all users
-router.get("/", verifyToken, async (req, res) => {
+router.get("/", async (req, res) => {
   const result = await usersCollection.find().toArray();
   res.send(result);
 });
@@ -110,6 +110,11 @@ router.post("/", async (req, res) => {
       });
     }
 
+    // Validate that user has password for non-social sign-in
+    if (!user.password) {
+      return res.status(400).send({ message: "Password is required" });
+    }
+
     const hashedPassword = await bcrypt.hash(user.password, 10);
 
     const newUser = {
@@ -123,7 +128,10 @@ router.post("/", async (req, res) => {
       insertedId: result.insertedId,
     });
   } catch (error) {
-    res.status(500).send({ message: "An error occurred", error });
+    console.error("Error during user creation:", error);
+    res
+      .status(500)
+      .send({ message: "An error occurred during user creation", error });
   }
 });
 

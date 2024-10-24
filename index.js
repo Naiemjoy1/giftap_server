@@ -18,6 +18,7 @@ const reviewRoutes = require("./routes/reviews");
 const adminRoutes = require("./routes/admin");
 const noticeRoutes = require("./routes/notice");
 const complainRoutes = require("./routes/complain");
+const sellerstatRoutes = require("./routes/sellerstas");
 const http = require("http");
 const { Server } = require("socket.io");
 const jwt = require("jsonwebtoken");
@@ -35,6 +36,7 @@ app.use(
       "http://localhost:5173",
       "http://localhost:5174",
       "https://giftap901.web.app",
+      "https://giftap901.firebaseapp.com",
     ],
     credentials: true,
     methods: ["GET", "POST", "PUT", "PATCH", "DELETE"],
@@ -71,6 +73,7 @@ app.use("/sellers", sellerRoutes);
 app.use("/reviews", reviewRoutes);
 app.use("/notice", noticeRoutes);
 app.use("/complain", complainRoutes);
+app.use("/sellerstat", sellerstatRoutes);
 
 // Root endpoint
 app.get("/", (req, res) => {
