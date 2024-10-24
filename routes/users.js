@@ -110,6 +110,11 @@ router.post("/", async (req, res) => {
       });
     }
 
+    // Validate that user has password for non-social sign-in
+    if (!user.password) {
+      return res.status(400).send({ message: "Password is required" });
+    }
+
     const hashedPassword = await bcrypt.hash(user.password, 10);
 
     const newUser = {
@@ -123,7 +128,10 @@ router.post("/", async (req, res) => {
       insertedId: result.insertedId,
     });
   } catch (error) {
-    res.status(500).send({ message: "An error occurred", error });
+    console.error("Error during user creation:", error);
+    res
+      .status(500)
+      .send({ message: "An error occurred during user creation", error });
   }
 });
 
