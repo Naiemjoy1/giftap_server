@@ -15,7 +15,8 @@ const paymentssRouters = require("./routes/payments");
 const emailRoutes = require("./routes/email");
 const sellersRoutes = require("./routes/sellers");
 const reviewsRoutes = require("./routes/reviews");
-const bannerRoutes = require("./routes/banner")
+const bannerRoutes = require("./routes/banner");
+const stripePaymentRoute = require("./routes/stripePayment")
 const http = require("http");
 const { Server } = require("socket.io");
 
@@ -55,6 +56,7 @@ app.use("/email", emailRoutes);
 app.use("/sellers", sellersRoutes);
 app.use("/reviews", reviewsRoutes);
 app.use("/banner", bannerRoutes);
+app.use("/stripePayment", stripePaymentRoute);
 
 app.get("/", (req, res) => {
   res.send("giftap Server Running");
