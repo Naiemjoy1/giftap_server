@@ -16,6 +16,9 @@ const emailRoutes = require("./routes/email");
 const sellersRoutes = require("./routes/sellers");
 const reviewsRoutes = require("./routes/reviews");
 const bannerRoutes = require("./routes/banner");
+const noticeRoutes = require("./routes/notice");
+const complainRoutes = require("./routes/complain");
+const sellerstatRoutes = require("./routes/sellerstas");
 const stripePaymentRoute = require("./routes/stripePayment")
 const http = require("http");
 const { Server } = require("socket.io");
@@ -29,7 +32,7 @@ const server = http.createServer(app);
 // Middleware
 app.use(
   cors({
-    origin: ["http://localhost:5173", "https://giftap901.web.app"],
+    origin: ["http://localhost:5173", "http://localhost:5174", "https://giftap901.web.app"],
     credentials: true,
     methods: ["GET", "POST", "PUT", "PATCH", "DELETE"],
   })
@@ -40,6 +43,15 @@ app.use(express.urlencoded({ extended: true }));
 
 // Connect to the database
 connectDB();
+
+// JWT creation endpoint
+app.post("/jwt", async (req, res) => {
+  const user = req.body;
+  const token = jwt.sign(user, process.env.ACCESS_TOKEN_SECRET, {
+    expiresIn: "1h",
+  });
+  res.send({ token });
+});
 
 // Use routes
 app.use("/products", productRoutes);
@@ -53,11 +65,10 @@ app.use("/carts", catrsRouters);
 app.use("/wishlists", wishlistsRouters);
 app.use("/payments", paymentssRouters);
 app.use("/email", emailRoutes);
-app.use("/sellers", sellersRoutes);
-app.use("/reviews", reviewsRoutes);
-app.use("/banner", bannerRoutes);
-app.use("/stripePayment", stripePaymentRoute);
+app.use("/sellers", sellerRoutes);
+app.use("/reviews", reviewRoutes);
 
+// Root endpoint
 app.get("/", (req, res) => {
   res.send("giftap Server Running");
 });
