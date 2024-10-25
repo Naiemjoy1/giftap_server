@@ -6,15 +6,20 @@ const { client } = require("../config/db");
 const blogCollection = client.db("giftap_DB").collection("blogs");
 
 router.get("/", async (req, res) => {
+  const filter = req.query;
 
-  const filter = req.query
-  // console.log(filter)
+  const searchTerm = typeof filter.search === "string" ? filter.search : "";
 
   const query = {
-    blogTitle: { $regex: filter.search, $options: "i" }
+    blogTitle: { $regex: searchTerm, $options: "i" },
+  };
+
+  try {
+    const result = await blogCollection.find(query).toArray();
+    res.send(result);
+  } catch (error) {
+    res.status(500).json({ message: "Error fetching blogs", error });
   }
-  const result = await blogCollection.find(query).toArray();
-  res.send(result);
 });
 
 router.get("/:id", async (req, res) => {
@@ -23,7 +28,6 @@ router.get("/:id", async (req, res) => {
   const result = await blogCollection.findOne(query);
   res.send(result);
 });
-
 
 router.get("/:id/blogComments", async (req, res) => {
   const id = req.params.id;
@@ -52,7 +56,5 @@ router.post("/:id/comments", async (req, res) => {
     res.status(500).json({ message: "Failed to add comment", error });
   }
 });
-
-
 
 module.exports = router;
