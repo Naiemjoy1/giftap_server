@@ -16,13 +16,14 @@ const emailRoutes = require("./routes/email");
 const sellersRoutes = require("./routes/sellers");
 const reviewsRoutes = require("./routes/reviews");
 const bannerRoutes = require("./routes/banner");
-const stripePaymentRoute = require("./routes/stripePayment")
+const stripePaymentRoute = require("./routes/stripePayment");
 const sellerRoutes = require("./routes/sellers");
 const reviewRoutes = require("./routes/reviews");
 const adminRoutes = require("./routes/admin");
 const noticeRoutes = require("./routes/notice");
 const complainRoutes = require("./routes/complain");
 const sellerstatRoutes = require("./routes/sellerstas");
+const jwt = require("jsonwebtoken");
 const http = require("http");
 const { Server } = require("socket.io");
 
@@ -81,7 +82,8 @@ app.use("/sellers", sellerRoutes);
 app.use("/reviews", reviewRoutes);
 app.use("/notice", noticeRoutes);
 app.use("/complain", complainRoutes);
-app.use("/sellerstat", sellerstatRoutes);
+app.use("/seller", sellerstatRoutes);
+app.use("/admin", adminRoutes);
 
 app.get("/", (req, res) => {
   res.send("giftap Server Running");
