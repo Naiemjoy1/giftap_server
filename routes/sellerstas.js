@@ -71,11 +71,14 @@ router.get("/seller-orders", async (req, res) => {
                 userId: product.userId,
                 date: order.date,
                 count: 0,
+                order: 1, // Set order to 1 per store entry
               };
             }
+            // Sum up product prices per store
             totals[product.store_name].totalPrice += product.price;
             totals[product.store_name].count += 1;
 
+            // Keep the most recent date for the store's order
             if (
               new Date(order.date) > new Date(totals[product.store_name].date)
             ) {
@@ -95,11 +98,21 @@ router.get("/seller-orders", async (req, res) => {
         { canceled: 0, home: 0, delivered: 0 }
       );
 
+      // Count total orders per store name
+      const totalOrdersPerStore = Object.keys(userPriceTotals).reduce(
+        (count, store) => {
+          count[store] = (count[store] || 0) + 1;
+          return count;
+        },
+        {}
+      );
+
       ordersWithProductData.push({
         date: order.date,
         deliverySummary,
         userPriceTotals,
         products: groupedProducts,
+        totalOrders: totalOrdersPerStore, // Include total orders per store
       });
     }
 
@@ -382,6 +395,125 @@ router.get("/seller-statistics", async (req, res) => {
   } catch (error) {
     console.error("Error fetching seller statistics:", error.message);
     res.status(500).json({ error: "Failed to fetch seller statistics." });
+  }
+});
+
+router.get("/order-data", async (req, res) => {
+  try {
+    const successfulOrders = await paymentCollection
+      .find({ status: "success" })
+      .toArray();
+
+    const orderData = {};
+    let overallTotalOrders = 0;
+    const thirtyDaysAgo = new Date();
+    thirtyDaysAgo.setDate(thirtyDaysAgo.getDate() - 30);
+
+    for (const order of successfulOrders) {
+      const productDetails = await productCollection
+        .find({ _id: { $in: order.productId.map((id) => new ObjectId(id)) } })
+        .toArray();
+
+      const productsWithDiscountedPrice = productDetails.map(
+        (product, index) => {
+          let discountedPrice;
+
+          if (product.category === "digital gift" && product.priceGroup) {
+            const matchingTier = product.priceGroup.find(
+              (tier) => tier.tier === order.tier[0]
+            );
+            if (matchingTier) {
+              discountedPrice =
+                matchingTier.price.amount * (1 - product.discount / 100);
+            }
+          } else {
+            discountedPrice = product.price * (1 - product.discount / 100);
+          }
+
+          return {
+            store_name: product.store_name,
+            userId: product.userId,
+            price: discountedPrice
+              ? parseFloat(discountedPrice.toFixed(2))
+              : null,
+            deliveryStatus: order.delivery[index],
+            date: new Date(order.date).toISOString().split("T")[0],
+          };
+        }
+      );
+
+      const validProducts = productsWithDiscountedPrice.filter(
+        (product) => product.deliveryStatus !== "canceled"
+      );
+
+      if (validProducts.length === 0) continue;
+
+      validProducts.forEach((product) => {
+        if (product.price) {
+          const storeName = product.store_name;
+          const date = new Date(product.date);
+
+          if (date >= thirtyDaysAgo) {
+            const month = `${date.getFullYear()}-${(date.getMonth() + 1)
+              .toString()
+              .padStart(2, "0")}`;
+            const year = date.getFullYear();
+
+            if (!orderData[storeName]) {
+              orderData[storeName] = {
+                totalOrders: 0,
+                dailyData: {},
+                monthlyData: {},
+                yearlyData: {},
+                totalRevenue: 0,
+              };
+            }
+
+            if (!orderData[storeName].dailyData[product.date]) {
+              orderData[storeName].dailyData[product.date] = {
+                totalRevenue: 0,
+                totalOrders: 0,
+              };
+            }
+
+            orderData[storeName].dailyData[product.date].totalRevenue +=
+              product.price;
+            orderData[storeName].dailyData[product.date].totalOrders += 1;
+
+            orderData[storeName].totalOrders += 1;
+            overallTotalOrders += 1;
+
+            if (!orderData[storeName].monthlyData[month]) {
+              orderData[storeName].monthlyData[month] = {
+                totalRevenue: 0,
+                totalOrders: 0,
+              };
+            }
+
+            orderData[storeName].monthlyData[month].totalRevenue +=
+              product.price;
+            orderData[storeName].monthlyData[month].totalOrders += 1;
+
+            if (!orderData[storeName].yearlyData[year]) {
+              orderData[storeName].yearlyData[year] = {
+                totalRevenue: 0,
+                totalOrders: 0,
+              };
+            }
+
+            orderData[storeName].yearlyData[year].totalRevenue += product.price;
+            orderData[storeName].yearlyData[year].totalOrders += 1;
+
+            orderData[storeName].totalRevenue += product.price;
+          }
+        }
+      });
+    }
+
+    res.json({ overallTotalOrders, orderData });
+  } catch (error) {
+    console.error("Error fetching order data:", error.message);
+    res.status(500).json({ error: "Failed to fetch order data." });
   }
 });
 
