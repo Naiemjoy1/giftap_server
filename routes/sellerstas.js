@@ -39,6 +39,8 @@ router.get("/seller-orders", async (req, res) => {
             userId: product.userId,
             store_name: product.store_name,
             category: product.category,
+            name: product.name,
+            sku: product.sku,
             price: discountedPrice
               ? parseFloat(discountedPrice.toFixed(2))
               : null,
@@ -47,31 +49,43 @@ router.get("/seller-orders", async (req, res) => {
         }
       );
 
-      const filteredProducts = productsWithDiscountedPrice.filter(
-        (product) => product.deliveryStatus !== "canceled"
+      const groupedProducts = productsWithDiscountedPrice.reduce(
+        (groups, product) => {
+          if (product.deliveryStatus !== "canceled") {
+            if (!groups[product.store_name]) {
+              groups[product.store_name] = [];
+            }
+            groups[product.store_name].push(product);
+          }
+          return groups;
+        },
+        {}
       );
 
-      const userPriceTotals = filteredProducts.reduce((totals, product) => {
-        if (product.price) {
-          if (!totals[product.store_name]) {
-            totals[product.store_name] = {
-              totalPrice: 0,
-              userId: product.userId,
-              date: order.date,
-              count: 0,
-            };
-          }
-          totals[product.store_name].totalPrice += product.price;
-          totals[product.store_name].count += 1;
+      const userPriceTotals = productsWithDiscountedPrice.reduce(
+        (totals, product) => {
+          if (product.price && product.deliveryStatus !== "canceled") {
+            if (!totals[product.store_name]) {
+              totals[product.store_name] = {
+                totalPrice: 0,
+                userId: product.userId,
+                date: order.date,
+                count: 0,
+              };
+            }
+            totals[product.store_name].totalPrice += product.price;
+            totals[product.store_name].count += 1;
 
-          if (
-            new Date(order.date) > new Date(totals[product.store_name].date)
-          ) {
-            totals[product.store_name].date = order.date;
+            if (
+              new Date(order.date) > new Date(totals[product.store_name].date)
+            ) {
+              totals[product.store_name].date = order.date;
+            }
           }
-        }
-        return totals;
-      }, {});
+          return totals;
+        },
+        {}
+      );
 
       const deliverySummary = order.delivery.reduce(
         (summary, status) => {
@@ -85,9 +99,7 @@ router.get("/seller-orders", async (req, res) => {
         date: order.date,
         deliverySummary,
         userPriceTotals,
-        products: filteredProducts.map(
-          ({ deliveryStatus, ...product }) => product
-        ),
+        products: groupedProducts,
       });
     }
 
