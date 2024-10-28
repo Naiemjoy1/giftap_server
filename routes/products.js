@@ -44,11 +44,11 @@ router.delete("/:id", async (req, res) => {
   res.send(result);
 });
 
-router.get('/category/:categoryName', async (req, res) => {
-  const result = await productCollection.find({ category: req.params.categoryName }).toArray();
-  res.send(result)
-
+router.get("/category/:categoryName", async (req, res) => {
+  const result = await productCollection
+    .find({ category: req.params.categoryName })
+    .toArray();
+  res.send(result);
 });
-
 
 module.exports = router;
