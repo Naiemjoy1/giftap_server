@@ -127,7 +127,12 @@ router.post("/success-payment", async (req, res) => {
         throw new Error("Shipping email not found.");
       }
 
-      await sendPaymentConfirmationEmail(payment.cus_email, payment.paymentId);
+      await sendPaymentConfirmationEmail(
+        payment.cus_email,
+        payment.paymentId,
+        payment.productId,
+        payment.quantities
+      );
 
       const { productId, delivery, message, quantities, category, tier } =
         payment;
