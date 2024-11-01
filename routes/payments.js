@@ -25,9 +25,9 @@ router.post("/", async (req, res) => {
       total_amount: paymentssl.amount,
       currency: paymentssl.currency,
       tran_id: trxId,
-      success_url: "https://giftap-server.vercel.app/payments/success-payment",
-      fail_url: "https://giftap-server.vercel.app/payments/fail",
-      cancel_url: "https://giftap-server.vercel.app/payments/cancel",
+      success_url: "http://localhost:3000/payments/success-payment",
+      fail_url: "http://localhost:3000/payments/fail",
+      cancel_url: "http://localhost:3000/payments/cancel",
       cus_name: paymentssl.name,
       cus_email: paymentssl.email,
       cus_add1: "Dhaka",
@@ -232,7 +232,7 @@ router.post("/success-payment", async (req, res) => {
       console.log("Deleted cart items:", deleteResult);
     }
 
-    res.redirect("https://giftap901.web.app/shop");
+    res.redirect("http://localhost:5173/shop");
   } catch (error) {
     console.error("Error on payment success:", error.message);
     res.status(500).send({ error: "Payment confirmation failed." });
@@ -240,11 +240,11 @@ router.post("/success-payment", async (req, res) => {
 });
 
 router.post("/fail", async (req, res) => {
-  res.redirect("https://giftap901.web.app/shop");
+  res.redirect("http://localhost:5173/shop");
 });
 
 router.post("/cancel", async (req, res) => {
-  res.redirect("https://giftap901.web.app/shop");
+  res.redirect("http://localhost:5173/shop");
 });
 
 router.patch("/", async (req, res) => {
