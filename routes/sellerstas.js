@@ -273,9 +273,13 @@ router.get("/seller-statistics", async (req, res) => {
             product.price.toFixed(2)
           );
 
-          statistics[storeName].deliverySummary[product.deliveryStatus] =
-            (statistics[storeName].deliverySummary[product.deliveryStatus] ||
-              0) + 1;
+          if (
+            ["canceled", "home", "delivered"].includes(product.deliveryStatus)
+          ) {
+            statistics[storeName].deliverySummary[product.deliveryStatus] =
+              (statistics[storeName].deliverySummary[product.deliveryStatus] ||
+                0) + 1;
+          }
 
           if (year === currentYear) {
             if (month === currentMonth) {
